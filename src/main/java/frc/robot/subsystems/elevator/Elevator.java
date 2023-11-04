@@ -45,6 +45,7 @@ public class Elevator extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
 
+    io.periodic();
     // Log elevator speed in RPM
     Logger.recordOutput("ElevatorSpeedRPM", getVelocityRPM());
   }
@@ -52,10 +53,14 @@ public class Elevator extends SubsystemBase {
   /** Run closed loop at the specified velocity. */
   public void runVelocity(double velocityRPM) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
-    io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));
-
-    // Log flywheel setpoint
+    io.setVoltage(velocityRPM*3 + 0.0); //kv, ks
+    
     Logger.recordOutput("ElevatorSetpointRPM", velocityRPM);
+  }
+
+  public void goToPosition(double position) {
+    io.goToPosition(position);
+    Logger.recordOutput("Elevator position", position);
   }
 
   /** Stops the flywheel. */

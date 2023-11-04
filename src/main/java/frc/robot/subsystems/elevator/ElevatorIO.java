@@ -2,6 +2,8 @@ package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.wpilibj2.command.Command;
+
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
@@ -19,6 +21,8 @@ public interface ElevatorIO {
 
   /** Run closed loop at the specified velocity. */
   public default void setVelocity(double velocityRadPerSec, double ffVolts) {}
+
+  public default void goToPosition(double position) {}
 
   /** Stop in open loop. */
   public default void stop() {}

@@ -129,9 +129,9 @@ public final class Constants {
   }
 
   public final class ElevatorSimConstants {
-    public static final double gearing = 1.5;
-    public static final double jKgMetersSquared = 0.004;
-    public static final double kP = 0.0;
+    public static final double gearing = 10.0*22.0/12.0;
+    public static final double jKgMetersSquared = 0.25;
+    public static final double kP = 30.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double maxVolts = 12.0;

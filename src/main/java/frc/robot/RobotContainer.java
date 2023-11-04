@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.subsystems.drive.Drive;
@@ -20,6 +21,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
@@ -37,6 +41,8 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Intake intake;
+  private final Elevator elevator;
+
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -61,6 +67,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));
         intake = new Intake(new IntakeIOTalonFX());
+        elevator = new Elevator(new ElevatorIOTalonFX());
         break;
 
       case SIM:
@@ -73,6 +80,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         intake = new Intake(new IntakeIOSim());
+        elevator = new Elevator(new ElevatorIOSim());
         break;
 
       default:
@@ -85,6 +93,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         intake = new Intake(new IntakeIOSim()); //braces thing doesnt work
+        elevator = new Elevator(new ElevatorIOSim());
         break;
     }
 
@@ -100,6 +109,7 @@ public class RobotContainer {
     autoChooser.addDefaultOption("Do Nothing", Commands.none());
     autoChooser.addOption("Example Auto", new PathPlannerAuto("Example Auto"));
     autoChooser.addOption("test auto", new PathPlannerAuto("Test Auto"));
+    autoChooser.addOption("move elevator", Commands.runOnce(()-> elevator.goToPosition(5000.0)));
 
     // Set up FF characterization routines
     autoChooser.addOption(
@@ -138,8 +148,8 @@ public class RobotContainer {
 
     */
 
-    intake.setDefaultCommand(
-      IntakeCommands.joystickIntake(intake, 
+    elevator.setDefaultCommand(
+      ElevatorCommands.joystickElevator(elevator, 
       () -> -controller.getLeftX()));
     
     /*

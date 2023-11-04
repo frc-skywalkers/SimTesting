@@ -18,13 +18,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.ElevatorConstants;
 
-//DOES NOT WORK DOES NOT WORK DOES NOT WORK
+//DOES NOT WORK DOES NOT WORK DOES NOT WORK - unless?
 public class ElevatorIOTalonFX implements ElevatorIO {
   private final TalonFX leftElevator = new TalonFX(ElevatorConstants.kLeftElevatorPort);
   private final TalonFX rightElevator = new TalonFX(ElevatorConstants.kRightElevatorPort);
 
   public boolean isZeroed = false;
   public boolean softLimitsEnabled = false;
+  public double goal;
+  public boolean m_enabled = false;
 
   private final StatusSignal<Double> Position = leftElevator.getPosition();
   private final StatusSignal<Double> Velocity = leftElevator.getVelocity();
@@ -103,12 +105,32 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     }
   }
 
+  
+  public void goToPosition(double position) {
+    goal = position;
+    m_enabled = true;
+    if (atGoal()){
+      m_enabled = false;
+    }
+  }
+
+  public boolean atGoal() {
+    // Dashboard.Elevator.Driver.putBoolean("Elevator Goal Reached", this.getController().atGoal());
+    return Math.abs(getPosition() - goal) <= 0.07;
+  }
+
+  public void setGoal(double position) {
+    goal = position;
+  }
+
+  /* 
   public void setVelocity(double speed) { //double ffvolts
     speed = MathUtil.clamp(speed, -ElevatorConstants.kMaxElevatorSpeed, ElevatorConstants.kMaxElevatorSpeed);
     rightElevator.set(speed);
     leftElevator.set(speed);
     //softlimits
   }
+  */
 
   /*
   public Command goToPosition(double position) {
@@ -142,15 +164,9 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   public void periodic() {
-    useOutput(profiledPIDController.calculate(leftElevator.getPosition().getValueAsDouble()),  );
-  }
-
-  public void setGoal(TrapezoidProfile.State goal) {
-    profiledPIDController.setGoal(goal);
-  }
-
-  public void setGoal(double goal) {
-    setGoal(new TrapezoidProfile.State(goal, 0));
+    if (m_enabled) {
+      useOutput(profiledPIDController.calculate(leftElevator.getPosition().getValueAsDouble()), new TrapezoidProfile.State(goal, 0));
+    }
   }
 
   public void configurePID(double kP, double kI, double kD) {
