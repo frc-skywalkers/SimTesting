@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -39,6 +40,8 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController controller2 = new CommandXboxController(1);
+
   private final JoystickSim joysticksim = new JoystickSim(0);
 
   // Dashboard inputs
@@ -115,6 +118,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    /* 
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
@@ -131,9 +135,18 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    */
+
+    intake.setDefaultCommand(
+      IntakeCommands.joystickIntake(intake, 
+      () -> -controller.getLeftX()));
+    
+    /*
     controller.y().onTrue(Commands.runOnce(() -> intake.moveIn()));
     controller.x().onTrue(Commands.runOnce(() -> intake.moveOut()));
     controller.a().onTrue(Commands.runOnce(() -> intake.stop()));
+    */
   }
 
   /**

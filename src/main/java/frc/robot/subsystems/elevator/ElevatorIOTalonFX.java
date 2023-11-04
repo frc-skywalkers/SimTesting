@@ -22,7 +22,6 @@ import frc.robot.Constants.ElevatorConstants;
 public class ElevatorIOTalonFX implements ElevatorIO {
   private final TalonFX leftElevator = new TalonFX(ElevatorConstants.kLeftElevatorPort);
   private final TalonFX rightElevator = new TalonFX(ElevatorConstants.kRightElevatorPort);
-  LinearFilter homingMovingAvg = LinearFilter.movingAverage(8);
 
   public boolean isZeroed = false;
   public boolean softLimitsEnabled = false;
@@ -32,21 +31,28 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   private final StatusSignal<Double> AppliedVolts = leftElevator.getMotorVoltage();
   private final StatusSignal<Double> LeftCurrent = leftElevator.getStatorCurrent();
   private final StatusSignal<Double> RightCurrent = rightElevator.getStatorCurrent();
-
-  public ElevatorIOTalonFX() {
-    ProfiledPIDController profiledPIDController = new ProfiledPIDController(
+  private final ProfiledPIDController profiledPIDController = new ProfiledPIDController(
         ElevatorConstants.kP,
         0.0,
         0.0,
-        new TrapezoidProfile.Constraints(ElevatorConstants.kMaxVel, ElevatorConstants.kMaxAcc));
+        new TrapezoidProfile.Constraints(ElevatorConstants.kMaxVel, ElevatorConstants.kMaxAcc));;
+
+  public ElevatorIOTalonFX() {
     profiledPIDController.setTolerance(0.02); 
 
-    var config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = ElevatorConstants.StatorCurrentLimit;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    leftElevator.getConfigurator().apply(config);
-    rightElevator.getConfigurator().apply(config);
+    TalonFXConfiguration leftconfig = new TalonFXConfiguration();
+    leftconfig.CurrentLimits.StatorCurrentLimit = ElevatorConstants.StatorCurrentLimit;
+    leftconfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    leftconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    leftconfig.Feedback.FeedbackRemoteSensorID = ElevatorConstants.kLeftElevatorPort;
+    TalonFXConfiguration rightconfig = new TalonFXConfiguration();
+    rightconfig.CurrentLimits.StatorCurrentLimit = ElevatorConstants.StatorCurrentLimit;
+    rightconfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    rightconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    rightconfig.Feedback.FeedbackRemoteSensorID = ElevatorConstants.kLeftElevatorPort; 
+    leftElevator.getConfigurator().apply(leftconfig);
+    rightElevator.getConfigurator().apply(rightconfig);
+
     leftElevator.setInverted(ElevatorConstants.kLeftInverted);
     rightElevator.setInverted(ElevatorConstants.kRightInverted);
     //missing feedbackdevice integratedsensor, phoenix6 imports?
@@ -82,6 +88,21 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     }
   }
 
+  public void useOutput(double output, TrapezoidProfile.State setpoint) {
+    double feedforward = 0;
+    if (setpoint.velocity > 0) {
+      feedforward = setpoint.velocity * ElevatorConstants.kVUp + ElevatorConstants.kSUp;
+    } else {
+      feedforward = setpoint.velocity * ElevatorConstants.kVDown + ElevatorConstants.kSDown;
+    }
+
+    if (isZeroed) {
+      setVoltage(feedforward + output);
+    } else {
+      // System.out.println("ELEVATOR NOT ZEROED!");
+    }
+  }
+
   public void setVelocity(double speed) { //double ffvolts
     speed = MathUtil.clamp(speed, -ElevatorConstants.kMaxElevatorSpeed, ElevatorConstants.kMaxElevatorSpeed);
     rightElevator.set(speed);
@@ -108,7 +129,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   public double getCurrent() {
-    return homingMovingAvg.calculate((LeftCurrent.getValueAsDouble() + RightCurrent.getValueAsDouble()) / 2.0);
+    return LeftCurrent.getValueAsDouble();
   }
 
   public void stop() {
@@ -116,7 +137,20 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   public void resetEncoders() {
-    //
+    leftElevator.getConfigurator().setPosition(0);
+    rightElevator.getConfigurator().setPosition(0);
+  }
+
+  public void periodic() {
+    useOutput(profiledPIDController.calculate(leftElevator.getPosition().getValueAsDouble()),  );
+  }
+
+  public void setGoal(TrapezoidProfile.State goal) {
+    profiledPIDController.setGoal(goal);
+  }
+
+  public void setGoal(double goal) {
+    setGoal(new TrapezoidProfile.State(goal, 0));
   }
 
   public void configurePID(double kP, double kI, double kD) {
