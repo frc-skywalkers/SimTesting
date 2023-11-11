@@ -109,7 +109,7 @@ public class RobotContainer {
     autoChooser.addDefaultOption("Do Nothing", Commands.none());
     autoChooser.addOption("Example Auto", new PathPlannerAuto("Example Auto"));
     autoChooser.addOption("test auto", new PathPlannerAuto("Test Auto"));
-    autoChooser.addOption("move elevator", Commands.runOnce(()-> elevator.goToPosition(5000.0)));
+    autoChooser.addOption("move elevator", elevator.goToPosition(3.5));
 
     // Set up FF characterization routines
     autoChooser.addOption(

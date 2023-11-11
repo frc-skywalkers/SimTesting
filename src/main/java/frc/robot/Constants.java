@@ -162,7 +162,7 @@ public final class Constants {
     public static final int kLeftElevatorPort = 31;
     public static final int kRightElevatorPort = 30;
     public static final double StatorCurrentLimit = 30.0;
-    public static final double kP = 30.00;
+    public static final double kP = 5.0; //was 30.0
     public static final double kMaxVel = 1.5;
     public static final double kMaxAcc = 2.0;
     public static final boolean kLeftInverted = false;

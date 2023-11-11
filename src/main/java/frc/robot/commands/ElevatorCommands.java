@@ -38,10 +38,12 @@ public class ElevatorCommands {
         elevator);
     }
 
+  /*
   public Command goToPosition(Elevator elevator, double position){
     return Commands.runOnce(() ->
         elevator.goToPosition(position));
   }
+  */
 }
   
   /*
