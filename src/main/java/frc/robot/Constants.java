@@ -162,12 +162,18 @@ public final class Constants {
     public static final int kLeftElevatorPort = 31;
     public static final int kRightElevatorPort = 30;
     public static final double StatorCurrentLimit = 30.0;
-    public static final double kP = 5.0; //was 30.0
+    public static final double kP = 30.0; //was 30.0 in offseason repo, used 5 most recently. not sure whats going on here
     public static final double kMaxVel = 1.5;
     public static final double kMaxAcc = 2.0;
     public static final boolean kLeftInverted = false;
     public static final boolean kRightInverted = true;
     public static final double kMaxElevatorSpeed = 0.5; //from skywalkers-offseason but ???
+
+    public static final double tiltAngle = Math.PI/2; //wrong
+    public static final double carraigeMassKg = 2.0; //wrong
+    public static final double drumRadiusMeters = 0.02;
+    public static final double minHeight = 0;
+    public static final double maxHeight = 4.5;
   }
 
   public final class ArmConstants {

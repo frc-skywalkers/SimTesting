@@ -5,9 +5,11 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorIOSim implements ElevatorIO {
-  private ElevatorSim elevator = new ElevatorSim(DCMotor.getNEO(1), 1.5, 2.0, 0.5, 0, 4.5, true, 0.5);
+  //private ElevatorSim elevator = new ElevatorSim(DCMotor.getNEO(1), 1.5, 2.0, 0.02, 0, 4.5, true, 0.5);
+  private TiltedElevatorSim elevator = new TiltedElevatorSim(DCMotor.getNEO(1), ElevatorConstants.gearRatio, ElevatorConstants.carraigeMassKg, ElevatorConstants.drumRadiusMeters, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true);
   //maybe minheight should be 0.05 or something
   //private DCMotorSim leftElevator = new DCMotorSim(DCMotor.getNEO(1), 1.5, 0.004);
   //private DCMotorSim rightElevator = new DCMotorSim(DCMotor.getNEO(1), 1.5, 0.004);
