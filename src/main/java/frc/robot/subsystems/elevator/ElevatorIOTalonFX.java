@@ -56,7 +56,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   @Override
   public void setVoltage(double volts) {
     if (isZeroed) {
-      volts = MathUtil.clamp(volts, -8, 8);
+      volts = MathUtil.clamp(volts, -ElevatorConstants.kMaxVolts, ElevatorConstants.kMaxVolts);
       leftElevator.setControl(new VoltageOut(volts));
     } else {
       stop();

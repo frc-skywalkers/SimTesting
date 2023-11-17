@@ -65,7 +65,7 @@ public class Elevator extends SubsystemBase {
     if (enabled) {
       //System.out.println("ajskdl"); //working
       pid.setGoal(new State(goal, 0));
-      pid.setTolerance(0.1, 0.1); //? yeah this does not work
+      pid.setTolerance(0.07, 0.07);
       double volts;
       double error = Math.abs(goal-inputs.positionRad);
 
@@ -75,7 +75,7 @@ public class Elevator extends SubsystemBase {
         volts = pid.calculate(inputs.positionRad) + ffModelDown.calculate(pid.getSetpoint().velocity);
       }
 
-      if (error<0.1){ //put this in constants later, also fix. shouldnt need this probably
+      if (error<0.07){ //put this in constants later, also fix. shouldnt need this probably
         volts = 0;
       }
 

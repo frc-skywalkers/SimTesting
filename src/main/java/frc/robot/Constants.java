@@ -162,7 +162,7 @@ public final class Constants {
     public static final int kLeftElevatorPort = 31;
     public static final int kRightElevatorPort = 30;
     public static final double StatorCurrentLimit = 30.0;
-    public static final double kP = 30.0; //was 30.0 in offseason repo, used 5 most recently. not sure whats going on here
+    public static final double kP = 30.0;
     public static final double kMaxVel = 1.5;
     public static final double kMaxAcc = 2.0;
     public static final boolean kLeftInverted = false;
@@ -174,6 +174,9 @@ public final class Constants {
     public static final double drumRadiusMeters = 0.02;
     public static final double minHeight = 0;
     public static final double maxHeight = 4.5;
+
+    public static final double kMaxVolts = 8.0;
+    public static final double kMaxVoltsSim = 12.0;
   }
 
   public final class ArmConstants {

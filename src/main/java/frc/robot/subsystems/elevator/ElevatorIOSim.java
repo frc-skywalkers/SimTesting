@@ -35,7 +35,7 @@ public class ElevatorIOSim implements ElevatorIO {
   @Override
   public void setVoltage(double volts) {
     closedLoop = false;
-    volts = MathUtil.clamp(volts, -8, 8);
+    volts = MathUtil.clamp(volts, -ElevatorConstants.kMaxVoltsSim, ElevatorConstants.kMaxVoltsSim);
     appliedVolts = volts;
     //leftElevator.setInputVoltage(volts);
     //rightElevator.setInputVoltage(volts);
