@@ -192,6 +192,21 @@ public final class Constants {
     public static final int kArmTicksPerRotation = 2048; // ??
     public static final double kPositionConversionFactor = 2 * Math.PI / (kArmTicksPerRotation * gearRatio);
     public static final double kVelocityConversionFactor = kPositionConversionFactor * 10.0;
+    public static final double armLengthMeters = 0.25; //idk
+    public static final double minAngleRads = -0.3; //need to redo these
+    public static final double maxAngleRads = 1.85;
+    public static final double kMaxVoltsSim = 6.00; //from offseason
+    public static final double kMaxVolts = 6.00;
+    public static final double jKgMetersSquared = 0.025; //???
+    public static final double StatorCurrentLimit = 15.00;
+
+    public static final double kVUp = 1.95;
+    public static final double kSUp = 0.613;
+    public static final double kVDown = 1.92;
+    public static final double kSDown = -0.424;
+
+    public static final double kMaxVel = 3; //from offseason
+    public static final double kMaxAcc = 4;
   }
 
   public final class IntakeConstants {

@@ -1,18 +1,16 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.arm;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 
-public class ElevatorIOSim implements ElevatorIO {
+public class ArmIOSim implements ArmIO {
   //private ElevatorSim elevator = new ElevatorSim(DCMotor.getNEO(1), ElevatorConstants.gearRatio, ElevatorConstants.carraigeMassKg, ElevatorConstants.drumRadiusMeters, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true, 0);
-  private TiltedElevatorSim elevator = new TiltedElevatorSim(DCMotor.getNEO(1), ElevatorConstants.gearRatio, ElevatorConstants.carraigeMassKg, ElevatorConstants.drumRadiusMeters, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true);
-  //maybe minheight should be 0.05 or something
-  //private DCMotorSim leftElevator = new DCMotorSim(DCMotor.getNEO(1), 1.5, 0.004);
-  //private DCMotorSim rightElevator = new DCMotorSim(DCMotor.getNEO(1), 1.5, 0.004);
+  private SingleJointedArmSim arm = new SingleJointedArmSim(DCMotor.getNEO(1), ArmConstants.gearRatio, ArmConstants.jKgMetersSquared, ArmConstants.armLengthMeters, ArmConstants.minAngleRads, ArmConstants.maxAngleRads, true, ArmConstants.minAngleRads); //need to change starting position too
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
   private boolean closedLoop = false;
@@ -20,26 +18,23 @@ public class ElevatorIOSim implements ElevatorIO {
   private double appliedVolts = 0.0;
 
   @Override
-  public void updateInputs(ElevatorIOInputs inputs) {
-    elevator.update(0.02);
-    //System.out.println("chchchhh"); //running
-    //inputs.positionRad = leftElevator.getAngularPositionRad();
-    //problem here
-    inputs.positionRad = elevator.getPositionMeters(); //getPositionMeters problem
+  public void updateInputs(ArmIOInputs inputs) {
+    arm.update(0.02);
+    inputs.positionRad = arm.getAngleRads();
     //inputs.velocityRadPerSec = leftElevator.getAngularVelocityRadPerSec();
-    inputs.velocityRadPerSec = elevator.getVelocityMetersPerSecond(); //change name
+    inputs.velocityRadPerSec = arm.getVelocityRadPerSec();
     inputs.appliedVolts = appliedVolts;
-    inputs.currentAmps = new double[] {elevator.getCurrentDrawAmps()};
+    inputs.currentAmps = new double[] {arm.getCurrentDrawAmps()};
   }
 
   @Override
   public void setVoltage(double volts) {
     closedLoop = false;
-    volts = MathUtil.clamp(volts, -ElevatorConstants.kMaxVoltsSim, ElevatorConstants.kMaxVoltsSim);
+    volts = MathUtil.clamp(volts, -ArmConstants.kMaxVoltsSim, ArmConstants.kMaxVoltsSim);
     appliedVolts = volts;
     //leftElevator.setInputVoltage(volts);
     //rightElevator.setInputVoltage(volts);
-    elevator.setInputVoltage(volts);
+    arm.setInputVoltage(volts);
   }
 
   /*

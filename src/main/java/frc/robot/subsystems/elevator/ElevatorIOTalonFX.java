@@ -15,8 +15,6 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
-  private static final double GEAR_RATIO = 1.5;
-
   private final TalonFX leftElevator = new TalonFX(ElevatorConstants.kLeftElevatorPort);
   private final TalonFX rightElevator = new TalonFX(ElevatorConstants.kRightElevatorPort);
 
@@ -32,7 +30,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     var config = new TalonFXConfiguration();
     config.CurrentLimits.StatorCurrentLimit = 30.0;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     leftElevator.getConfigurator().apply(config);
     rightElevator.getConfigurator().apply(config);
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -45,9 +43,9 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     BaseStatusSignal.refreshAll(
         Position, Velocity, AppliedVolts, Current, followerCurrent);
-    inputs.positionRad = Units.rotationsToRadians(Position.getValueAsDouble()) / GEAR_RATIO;
+    inputs.positionRad = Units.rotationsToRadians(Position.getValueAsDouble()) / ElevatorConstants.gearRatio;
     inputs.velocityRadPerSec =
-        Units.rotationsToRadians(Velocity.getValueAsDouble()) / GEAR_RATIO;
+        Units.rotationsToRadians(Velocity.getValueAsDouble()) / ElevatorConstants.gearRatio;
     inputs.appliedVolts = AppliedVolts.getValueAsDouble();
     inputs.currentAmps =
         new double[] {Current.getValueAsDouble(), followerCurrent.getValueAsDouble()};
@@ -87,5 +85,10 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   public void getPosition() {
     //Elevator.elevatorposition = Position.getValueAsDouble();
+  }
+
+  public void reset() {
+    leftElevator.setPosition(0);
+    isZeroed = true;
   }
 }

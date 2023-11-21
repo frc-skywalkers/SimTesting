@@ -15,6 +15,9 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.IntakeCommands;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmIOSim;
+import frc.robot.subsystems.arm.ArmIOTalonFX;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -42,7 +45,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Intake intake;
   private final Elevator elevator;
-
+  private final Arm arm;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -68,6 +71,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(3));
         intake = new Intake(new IntakeIOTalonFX());
         elevator = new Elevator(new ElevatorIOTalonFX());
+        arm = new Arm(new ArmIOTalonFX());
         break;
 
       case SIM:
@@ -81,6 +85,7 @@ public class RobotContainer {
                 new ModuleIOSim());
         intake = new Intake(new IntakeIOSim());
         elevator = new Elevator(new ElevatorIOSim());
+        arm = new Arm(new ArmIOSim());
         break;
 
       default:
@@ -94,6 +99,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         intake = new Intake(new IntakeIOSim()); //braces thing doesnt work
         elevator = new Elevator(new ElevatorIOSim());
+        arm = new Arm(new ArmIOSim());
         break;
     }
 
@@ -110,6 +116,7 @@ public class RobotContainer {
     autoChooser.addOption("Example Auto", new PathPlannerAuto("Example Auto"));
     autoChooser.addOption("test auto", new PathPlannerAuto("Test Auto"));
     autoChooser.addOption("move elevator", elevator.goToPosition(1.5));
+    autoChooser.addOption("move arm", arm.goToPosition(1.5));
 
     // Set up FF characterization routines
     autoChooser.addOption(
@@ -148,9 +155,11 @@ public class RobotContainer {
 
     */
 
+    /*
     elevator.setDefaultCommand(
       ElevatorCommands.joystickElevator(elevator, 
       () -> -controller.getLeftX()));
+    */
     
     /*
     controller.y().onTrue(Commands.runOnce(() -> intake.moveIn()));
