@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -12,9 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.IntakeCommands;
+import frc.robot.commands.Macros;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.arm.ArmIOTalonFX;
@@ -30,6 +32,8 @@ import frc.robot.subsystems.elevator.ElevatorIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
+
+import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
@@ -52,6 +56,7 @@ public class RobotContainer {
   private final CommandXboxController controller2 = new CommandXboxController(1);
 
   private final JoystickSim joysticksim = new JoystickSim(0);
+  private final Macros macros;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -72,6 +77,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX());
         elevator = new Elevator(new ElevatorIOTalonFX());
         arm = new Arm(new ArmIOTalonFX());
+        macros = new Macros(drive, arm, elevator, intake);
         break;
 
       case SIM:
@@ -86,6 +92,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOSim());
         elevator = new Elevator(new ElevatorIOSim());
         arm = new Arm(new ArmIOSim());
+        macros = new Macros(drive, arm, elevator, intake);
         break;
 
       default:
@@ -100,6 +107,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOSim()); //braces thing doesnt work
         elevator = new Elevator(new ElevatorIOSim());
         arm = new Arm(new ArmIOSim());
+        macros = new Macros(drive, arm, elevator, intake);
         break;
     }
 
@@ -115,8 +123,10 @@ public class RobotContainer {
     autoChooser.addDefaultOption("Do Nothing", Commands.none());
     autoChooser.addOption("Example Auto", new PathPlannerAuto("Example Auto"));
     autoChooser.addOption("test auto", new PathPlannerAuto("Test Auto"));
-    autoChooser.addOption("move elevator", elevator.goToPosition(1.5));
+    autoChooser.addOption("move elevator", elevator.goToPosition(1.1));
     autoChooser.addOption("move arm", arm.goToPosition(1.5));
+    autoChooser.addOption("move to preset", macros.moveToPreset(1.1, 1.5)); 
+    //arm start position is -0.3 radians rn, elevator is 0
 
     // Set up FF characterization routines
     autoChooser.addOption(
@@ -155,17 +165,23 @@ public class RobotContainer {
 
     */
 
-    /*
-    elevator.setDefaultCommand(
-      ElevatorCommands.joystickElevator(elevator, 
-      () -> -controller.getLeftX()));
-    */
+    elevator.setDefaultCommand(Commands.run(() -> {
+      double linearMagnitude = MathUtil.applyDeadband(-controller.getLeftX(), Constants.kDeadband);
+      linearMagnitude = linearMagnitude * linearMagnitude;
+      elevator.runVelocity(linearMagnitude);
+    }, elevator));
+
+    arm.setDefaultCommand(Commands.run(() -> {
+      double linearMagnitude = MathUtil.applyDeadband(-controller.getLeftY(), Constants.kDeadband);
+      linearMagnitude = linearMagnitude * linearMagnitude;
+      arm.runVelocity(linearMagnitude);
+    }, arm));
+
     
-    /*
     controller.y().onTrue(Commands.runOnce(() -> intake.moveIn()));
     controller.x().onTrue(Commands.runOnce(() -> intake.moveOut()));
     controller.a().onTrue(Commands.runOnce(() -> intake.stop()));
-    */
+    
   }
 
   /**

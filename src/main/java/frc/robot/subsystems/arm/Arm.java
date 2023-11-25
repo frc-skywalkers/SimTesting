@@ -40,7 +40,7 @@ public class Arm extends SubsystemBase {
       case REPLAY: //?
         ffModelUp = new SimpleMotorFeedforward(ArmConstants.kSUp, ArmConstants.kVUp);
         ffModelDown = new SimpleMotorFeedforward(ArmConstants.kSDown, ArmConstants.kVDown);
-        pid = new ProfiledPIDController(ArmConstants.kP, 0, 0, new TrapezoidProfile.Constraints(ArmConstants.kMaxVel, ArmConstants.kMaxAcc));
+        pid = new ProfiledPIDController(ArmConstants.kPsim, 0, 0, new TrapezoidProfile.Constraints(ArmConstants.kMaxVel, ArmConstants.kMaxAcc));
         break;
       case SIM:
         ffModelUp = new SimpleMotorFeedforward(ArmConstants.kSUp, ArmConstants.kVUp);

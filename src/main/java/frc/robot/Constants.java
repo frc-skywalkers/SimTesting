@@ -25,6 +25,8 @@ public final class Constants {
     REPLAY
   }
 
+  public static final double kDeadband = 0.1;
+
   public final class DriveConstants {
     public static final double DEADBAND = 0.15;
     public static final double MAX_LINEAR_SPEED = 5.00; //meters per second
@@ -162,7 +164,7 @@ public final class Constants {
     public static final int kLeftElevatorPort = 31;
     public static final int kRightElevatorPort = 30;
     public static final double StatorCurrentLimit = 30.0;
-    public static final double kP = 30.0;
+    public static final double kP = 30.0; //was 30
     public static final double kMaxVel = 1.5;
     public static final double kMaxAcc = 2.0;
     public static final boolean kLeftInverted = false;
@@ -170,7 +172,7 @@ public final class Constants {
     public static final double kMaxElevatorSpeed = 0.5; //from skywalkers-offseason but ???
 
     public static final double tiltAngle = Math.PI/2; //wrong
-    public static final double carraigeMassKg = 2.0; //wrong
+    public static final double carraigeMassKg = 1.5; //wrong
     public static final double drumRadiusMeters = 0.02;
     public static final double minHeight = 0;
     public static final double maxHeight = 4.5;
@@ -182,6 +184,7 @@ public final class Constants {
   public final class ArmConstants {
     public static final int kArmPort = 23;
     public static final double kP = 10.00;
+    public static final double kPsim = 6.00;
     public static final double kI = 0;
     public static final double kD = 0;
     public static final boolean kInverted = false;
@@ -197,7 +200,7 @@ public final class Constants {
     public static final double maxAngleRads = 1.85;
     public static final double kMaxVoltsSim = 6.00; //from offseason
     public static final double kMaxVolts = 6.00;
-    public static final double jKgMetersSquared = 0.025; //???
+    public static final double jKgMetersSquared = 0.05; //???
     public static final double StatorCurrentLimit = 15.00;
 
     public static final double kVUp = 1.95;
