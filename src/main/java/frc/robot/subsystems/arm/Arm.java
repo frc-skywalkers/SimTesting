@@ -31,13 +31,13 @@ public class Arm extends SubsystemBase {
 
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
-    switch (Constants.currentMode) {
-      case REAL: //idk should these all be with the same constants?
+    switch (Constants.currentMode) { //currentMode needs to be changed in Constants depending on situation
+      case REAL: 
         ffModelUp = new SimpleMotorFeedforward(ArmConstants.kSUp, ArmConstants.kVUp);
         ffModelDown = new SimpleMotorFeedforward(ArmConstants.kSDown, ArmConstants.kVDown);
         pid = new ProfiledPIDController(ArmConstants.kP, 0, 0, new TrapezoidProfile.Constraints(ArmConstants.kMaxVel, ArmConstants.kMaxAcc));
         break;
-      case REPLAY: //?
+      case REPLAY: 
         ffModelUp = new SimpleMotorFeedforward(ArmConstants.kSUp, ArmConstants.kVUp);
         ffModelDown = new SimpleMotorFeedforward(ArmConstants.kSDown, ArmConstants.kVDown);
         pid = new ProfiledPIDController(ArmConstants.kPsim, 0, 0, new TrapezoidProfile.Constraints(ArmConstants.kMaxVel, ArmConstants.kMaxAcc));
@@ -60,29 +60,32 @@ public class Arm extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);
     // Log elevator speed in RPM
-    Logger.recordOutput("ArmSpeedRPM", getVelocityRPM());
+    Logger.recordOutput("ArmSpeedRPM", getVelocityRPM()); //goes under RealOutputs
+    Logger.recordOutput("ArmPosRad", inputs.positionRad);
+    Logger.recordOutput("ArmVolts", inputs.appliedVolts);
+    Logger.recordOutput("ArmCurrent", inputs.currentAmps);
 
-    if (enabled) {
-      //System.out.println("ajskdl"); //working
-      pid.setGoal(new State(goal, 0));
+
+    if (enabled) { //only true while goToPosition is running
+      pid.setGoal(new State(goal, 0)); 
       pid.setTolerance(0.07, 0.07);
       double volts;
       double error = Math.abs(goal-inputs.positionRad);
 
-      if (pid.getSetpoint().velocity>0){ //?
+      if (pid.getSetpoint().velocity>0){ //signs of velocities on the way to the goal to see if elevator is going up or down
         volts = pid.calculate(inputs.positionRad) + ffModelUp.calculate(pid.getSetpoint().velocity);
       } else {
         volts = pid.calculate(inputs.positionRad) + ffModelDown.calculate(pid.getSetpoint().velocity);
       }
 
-      if (error<0.07){ //put this in constants later, also fix. shouldnt need this probably
+      
+      if (error<0.07){ //v redundant but there's a small spike for some reason when this is removed
         volts = 0;
       }
+      
 
-      io.setVoltage(volts); //this is where appliedvolts comes from, clamped 8
-      Logger.recordOutput("calculated volts", volts);
-      Logger.recordOutput("Arm goal", goal);
-      Logger.recordOutput("error", error); }
+      io.setVoltage(volts);
+    }
     else {
       io.setVoltage(0);
     }
@@ -91,31 +94,12 @@ public class Arm extends SubsystemBase {
   public Command goToPosition(double goal) {
     BooleanSupplier sup = () -> pid.atGoal();
     return Commands.runOnce(()-> {
-      enabled = true;
+      enabled = true; //turns on all the calculations
       this.goal = goal;
-    }, this).andThen(Commands.waitUntil(sup)).andThen(() -> {enabled = false;});    
+    }, this).andThen(Commands.waitUntil(sup)).andThen(() -> {enabled = false;}); //turns off once goal is reached 
     }
 
-    /*
-    pid.setGoal(new State(goal, 0));
-    //pid.setTolerance(10, 0.01);
-    double volts;
-    double error = Math.abs(goal-inputs.positionRad);
-    if (pid.getSetpoint().velocity > 0){
-      volts = pid.calculate(inputs.positionRad) + ffModelUp.calculate(pid.getSetpoint().velocity);
-    } else {
-      volts = pid.calculate(inputs.positionRad) + ffModelDown.calculate(pid.getSetpoint().velocity);
-    }
-    if (error<5){
-      volts = 0;
-    }
-    io.setVoltage(volts);
-    Logger.recordOutput("Elevator goal", goal);
-    Logger.recordOutput("error", error);
-    */
-  
-
-  /** Stops the flywheel. */
+  //stops arm
   public void stop() {
     io.stop();
   }
@@ -124,17 +108,16 @@ public class Arm extends SubsystemBase {
     io.setVelocity(velocity);
   }
 
-  /** Returns the current velocity in RPM. */
+  //converts to RPM for logging
   public double getVelocityRPM() {
     return Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
   }
 
-  /** Runs forwards at the commanded voltage. */
   public void runCharacterizationVolts(double volts) {
     io.setVoltage(volts);
   }
 
-  /** Returns the average drive velocity in radians/sec. */
+  //avg velocity in radians/sec
   public double getCharacterizationVelocity() {
     return inputs.velocityRadPerSec;
   }

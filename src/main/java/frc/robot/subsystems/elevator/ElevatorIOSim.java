@@ -9,10 +9,9 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorIOSim implements ElevatorIO {
   //private ElevatorSim elevator = new ElevatorSim(DCMotor.getNEO(1), ElevatorConstants.gearRatio, ElevatorConstants.carraigeMassKg, ElevatorConstants.drumRadiusMeters, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true, 0);
-  private TiltedElevatorSim elevator = new TiltedElevatorSim(DCMotor.getNEO(1), ElevatorConstants.gearRatio, ElevatorConstants.carraigeMassKg, ElevatorConstants.drumRadiusMeters, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true);
+  //uses basic trig to factor in angle between gravity and elevator
+  private TiltedElevatorSim elevator = new TiltedElevatorSim(DCMotor.getFalcon500(1), ElevatorConstants.gearRatio, ElevatorConstants.carraigeMassKg, ElevatorConstants.drumRadiusMeters, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true);
   //maybe minheight should be 0.05 or something
-  //private DCMotorSim leftElevator = new DCMotorSim(DCMotor.getNEO(1), 1.5, 0.004);
-  //private DCMotorSim rightElevator = new DCMotorSim(DCMotor.getNEO(1), 1.5, 0.004);
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
   private boolean closedLoop = false;
@@ -23,10 +22,7 @@ public class ElevatorIOSim implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     elevator.update(0.02);
     //System.out.println("chchchhh"); //running
-    //inputs.positionRad = leftElevator.getAngularPositionRad();
-    //problem here
-    inputs.positionRad = elevator.getPositionMeters(); //getPositionMeters problem
-    //inputs.velocityRadPerSec = leftElevator.getAngularVelocityRadPerSec();
+    inputs.positionRad = elevator.getPositionMeters();
     inputs.velocityRadPerSec = elevator.getVelocityMetersPerSecond(); //change name
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = new double[] {elevator.getCurrentDrawAmps()};
@@ -37,18 +33,8 @@ public class ElevatorIOSim implements ElevatorIO {
     closedLoop = false;
     volts = MathUtil.clamp(volts, -ElevatorConstants.kMaxVoltsSim, ElevatorConstants.kMaxVoltsSim);
     appliedVolts = volts;
-    //leftElevator.setInputVoltage(volts);
-    //rightElevator.setInputVoltage(volts);
     elevator.setInputVoltage(volts);
   }
-
-  /*
-  @Override
-  public void setVelocity(double velocityRadPerSec) {
-    closedLoop = true;
-    pid.setSetpoint(velocityRadPerSec);
-  }
-  */
 
   @Override
   public void stop() {

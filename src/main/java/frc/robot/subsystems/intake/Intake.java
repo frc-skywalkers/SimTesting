@@ -39,15 +39,19 @@ public class Intake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
 
-    // Log flywheel speed in RPM
+    // Log speed in RPM
     Logger.recordOutput("IntakeSpeedRPM", getVelocityRPM());
+    Logger.recordOutput("IntakePosRad", inputs.positionRad);
+    Logger.recordOutput("IntakeVolts", inputs.appliedVolts);
+    Logger.recordOutput("IntakeCurrent", inputs.currentAmps);
+    Logger.recordOutput("Mode", inputs.Mode);
   }
 
   public void runVelocity(double velocityRPM) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
     io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));
 
-    // Log flywheel setpoint
+    // Log setpoint
     Logger.recordOutput("IntakeSetpointRPM", velocityRPM);
   }
 

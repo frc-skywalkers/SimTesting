@@ -44,7 +44,7 @@ public class Drive extends SubsystemBase {
     modules[2] = new Module(blModuleIO, 2);
     modules[3] = new Module(brModuleIO, 3);
 
-    SmartDashboard.putData("Field", m_field);
+    SmartDashboard.putData("Field", m_field); //mini field in smartdashboard, not needed
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
@@ -55,8 +55,8 @@ public class Drive extends SubsystemBase {
         new HolonomicPathFollowerConfig(
             DriveConstants.MAX_LINEAR_SPEED, DriveConstants.DRIVE_BASE_RADIUS, new ReplanningConfig()),
         this);
-    Pathfinding.setPathfinder(new LocalADStarAK());
-    PathPlannerLogging.setLogActivePathCallback(
+    Pathfinding.setPathfinder(new LocalADStarAK()); //idk
+    PathPlannerLogging.setLogActivePathCallback( //can find paths under odometry folder
         (activePath) -> {
           Logger.recordOutput(
               "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
@@ -98,7 +98,7 @@ public class Drive extends SubsystemBase {
     // The twist represents the motion of the robot since the last
     // loop cycle in x, y, and theta based only on the modules,
     // without the gyro. The gyro is always disconnected in simulation.
-    var twist = kinematics.toTwist2d(wheelDeltas); //what
+    var twist = kinematics.toTwist2d(wheelDeltas);
     if (gyroInputs.connected) {
       // If the gyro is connected, replace the theta component of the twist
       // with the change in angle since the last loop cycle.
@@ -111,7 +111,6 @@ public class Drive extends SubsystemBase {
     pose = pose.exp(twist);
     Logger.recordOutput("Odometry/Robot", getPose());
     m_field.setRobotPose(getPose());
-    //System.out.println(":))"); //this one is running
   }
 
   /**

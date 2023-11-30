@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIOSim implements IntakeIO {
-  private DCMotorSim intakeSim = new DCMotorSim(DCMotor.getNEO(1), 1.5, 0.004);
+  private DCMotorSim intakeSim = new DCMotorSim(DCMotor.getFalcon500(1), 1.5, 0.004);
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
   private boolean closedLoop = false;
@@ -48,14 +48,14 @@ public class IntakeIOSim implements IntakeIO {
   public void updateInputs(IntakeIOInputs inputs) {
     if (closedLoop) {
       appliedVolts =
-          MathUtil.clamp(pid.calculate(intakeSim.getAngularVelocityRadPerSec()) + ffVolts, -12.0, 12.0);
+          MathUtil.clamp(pid.calculate(intakeSim.getAngularVelocityRadPerSec()) + ffVolts, -12.0, 12.0); //pid+feedforward, clamped
       intakeSim.setInputVoltage(appliedVolts);
     }
 
     intakeSim.update(0.02);
 
     inputs.positionRad = 0.0;
-    inputs.velocityRadPerSec = intakeSim.getAngularVelocityRadPerSec();
+    inputs.velocityRadPerSec = intakeSim.getAngularVelocityRadPerSec(); //takes updated values and puts them in autologged for intake.java
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = new double[] {intakeSim.getCurrentDrawAmps()};
   }

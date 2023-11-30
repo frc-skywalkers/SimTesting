@@ -14,8 +14,8 @@ import frc.robot.Constants.SimModuleConstants;
  * approximation for the behavior of the module.
  */
 public class ModuleIOSim implements ModuleIO {
-  private DCMotorSim driveSim = new DCMotorSim(DCMotor.getNEO(1), SimModuleConstants.driveGearing, SimModuleConstants.drivejKgMetersSquared);
-  private DCMotorSim turnSim = new DCMotorSim(DCMotor.getNEO(1), SimModuleConstants.turnGearing, SimModuleConstants.turnjKgMetersSquared);
+  private DCMotorSim driveSim = new DCMotorSim(DCMotor.getFalcon500(1), SimModuleConstants.driveGearing, SimModuleConstants.drivejKgMetersSquared);
+  private DCMotorSim turnSim = new DCMotorSim(DCMotor.getFalcon500(1), SimModuleConstants.turnGearing, SimModuleConstants.turnjKgMetersSquared);
 
   private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
   private double driveAppliedVolts = 0.0;

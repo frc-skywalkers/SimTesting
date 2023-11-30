@@ -32,12 +32,12 @@ public class Elevator extends SubsystemBase {
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
     switch (Constants.currentMode) {
-      case REAL: //idk should these all be with the same constants?
+      case REAL: //can tune constants differently
         ffModelUp = new SimpleMotorFeedforward(ElevatorConstants.kSUp, ElevatorConstants.kVUp);
         ffModelDown = new SimpleMotorFeedforward(ElevatorConstants.kSDown, ElevatorConstants.kVDown);
         pid = new ProfiledPIDController(ElevatorConstants.kP, 0, 0, new TrapezoidProfile.Constraints(ElevatorConstants.kMaxVel, ElevatorConstants.kMaxAcc));
         break;
-      case REPLAY: //?
+      case REPLAY:
         ffModelUp = new SimpleMotorFeedforward(ElevatorConstants.kSUp, ElevatorConstants.kVUp);
         ffModelDown = new SimpleMotorFeedforward(ElevatorConstants.kSDown, ElevatorConstants.kVDown);
         pid = new ProfiledPIDController(ElevatorConstants.kP, 0, 0, new TrapezoidProfile.Constraints(ElevatorConstants.kMaxVel, ElevatorConstants.kMaxAcc));
@@ -61,6 +61,9 @@ public class Elevator extends SubsystemBase {
     Logger.processInputs("Elevator", inputs);
     // Log elevator speed in RPM
     Logger.recordOutput("ElevatorSpeedRPM", getVelocityRPM());
+    Logger.recordOutput("ElevatorPosRad", inputs.positionRad);
+    Logger.recordOutput("ElevatorVolts", inputs.appliedVolts);
+    Logger.recordOutput("ElevatorCurrent", inputs.currentAmps);
 
     if (enabled) {
       //System.out.println("ajskdl"); //working
@@ -69,13 +72,13 @@ public class Elevator extends SubsystemBase {
       double volts;
       double error = Math.abs(goal-inputs.positionRad);
 
-      if (pid.getSetpoint().velocity>0){ //?
+      if (pid.getSetpoint().velocity>0){ //up or down, voltage adjust for gravity
         volts = pid.calculate(inputs.positionRad) + ffModelUp.calculate(pid.getSetpoint().velocity);
       } else {
         volts = pid.calculate(inputs.positionRad) + ffModelDown.calculate(pid.getSetpoint().velocity);
       }
 
-      if (error<0.07){ //put this in constants later, also fix. shouldnt need this probably
+      if (error<0.07){ //shouldnt need this
         volts = 0;
       }
 
@@ -91,31 +94,11 @@ public class Elevator extends SubsystemBase {
   public Command goToPosition(double goal) {
     BooleanSupplier sup = () -> pid.atGoal();
     return Commands.runOnce(()-> {
-      enabled = true;
-      this.goal = goal;
+      enabled = true; //when gotoposition is running it calculates voltage, otherwise nothing
+      this.goal = goal; //^ might need to make some minor changes before adding direct joystick control
     }, this).andThen(Commands.waitUntil(sup)).andThen(() -> {enabled = false;});    
     }
-
-    /*
-    pid.setGoal(new State(goal, 0));
-    //pid.setTolerance(10, 0.01);
-    double volts;
-    double error = Math.abs(goal-inputs.positionRad);
-    if (pid.getSetpoint().velocity > 0){
-      volts = pid.calculate(inputs.positionRad) + ffModelUp.calculate(pid.getSetpoint().velocity);
-    } else {
-      volts = pid.calculate(inputs.positionRad) + ffModelDown.calculate(pid.getSetpoint().velocity);
-    }
-    if (error<5){
-      volts = 0;
-    }
-    io.setVoltage(volts);
-    Logger.recordOutput("Elevator goal", goal);
-    Logger.recordOutput("error", error);
-    */
   
-
-  /** Stops the flywheel. */
   public void stop() {
     io.stop();
   }

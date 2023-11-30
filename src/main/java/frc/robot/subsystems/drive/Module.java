@@ -29,7 +29,7 @@ public class Module {
 
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
-    switch (Constants.currentMode) { //yuck
+    switch (Constants.currentMode) { 
       case REAL:
         driveFeedforward = new SimpleMotorFeedforward(ModuleConstants.realDrivekS, ModuleConstants.realDrivekV);
         driveFeedback = new PIDController(ModuleConstants.realDrivekP, ModuleConstants.realDrivekI, ModuleConstants.realDrivekD);

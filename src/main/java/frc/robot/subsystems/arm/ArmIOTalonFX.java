@@ -17,7 +17,7 @@ import frc.robot.Constants.ArmConstants;
 public class ArmIOTalonFX implements ArmIO {
   private final TalonFX armMotor = new TalonFX(ArmConstants.kArmPort);
 
-  private final StatusSignal<Double> Position = armMotor.getPosition();
+  private final StatusSignal<Double> Position = armMotor.getPosition(); //phoenix 6 stuff
   private final StatusSignal<Double> Velocity = armMotor.getVelocity(); //rotations per second
   private final StatusSignal<Double> AppliedVolts = armMotor.getMotorVoltage();
   private final StatusSignal<Double> Current = armMotor.getStatorCurrent();
@@ -32,7 +32,7 @@ public class ArmIOTalonFX implements ArmIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     armMotor.getConfigurator().apply(config);
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0, Position, Velocity, AppliedVolts, Current, followerCurrent);
+        50.0, Position, Velocity, AppliedVolts, Current, followerCurrent); //things to update
     armMotor.optimizeBusUtilization();
   }
 
@@ -73,11 +73,7 @@ public class ArmIOTalonFX implements ArmIO {
     armMotor.getConfigurator().apply(config);
   }
 
-  public void getPosition() {
-    //Elevator.elevatorposition = Position.getValueAsDouble();
-  }
-
-  public void reset() { //we dont need this?
+  public void reset() { 
     armMotor.setPosition(0);
   }
 }

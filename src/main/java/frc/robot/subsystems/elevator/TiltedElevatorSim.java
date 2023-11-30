@@ -11,6 +11,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import frc.robot.Constants.ElevatorConstants;
 
+//almost exactly the same as wpilib elevatorsim only instead of using 9.8 for gravity it uses 9.8sin(theta)
 public class TiltedElevatorSim extends LinearSystemSim<N2, N1, N1>{
     //elevator gearbox
     private final DCMotor m_gearbox;

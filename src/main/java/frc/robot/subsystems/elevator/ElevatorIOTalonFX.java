@@ -18,7 +18,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   private final TalonFX leftElevator = new TalonFX(ElevatorConstants.kLeftElevatorPort);
   private final TalonFX rightElevator = new TalonFX(ElevatorConstants.kRightElevatorPort);
 
-  private final StatusSignal<Double> Position = leftElevator.getPosition();
+  private final StatusSignal<Double> Position = leftElevator.getPosition(); //for phoenix6
   private final StatusSignal<Double> Velocity = leftElevator.getVelocity();
   private final StatusSignal<Double> AppliedVolts = leftElevator.getMotorVoltage();
   private final StatusSignal<Double> Current = leftElevator.getStatorCurrent();
@@ -30,7 +30,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     var config = new TalonFXConfiguration();
     config.CurrentLimits.StatorCurrentLimit = 30.0;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake; //i think sim doesnt have brake/coast mode which is why it slides a ton
     leftElevator.getConfigurator().apply(config);
     rightElevator.getConfigurator().apply(config);
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -41,9 +41,9 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-    BaseStatusSignal.refreshAll(
+    BaseStatusSignal.refreshAll( //updates all inputs
         Position, Velocity, AppliedVolts, Current, followerCurrent);
-    inputs.positionRad = Units.rotationsToRadians(Position.getValueAsDouble()) / ElevatorConstants.gearRatio;
+    inputs.positionRad = Units.rotationsToRadians(Position.getValueAsDouble()) / ElevatorConstants.gearRatio; //puts them in autologged list for use in elevator.java
     inputs.velocityRadPerSec =
         Units.rotationsToRadians(Velocity.getValueAsDouble()) / ElevatorConstants.gearRatio;
     inputs.appliedVolts = AppliedVolts.getValueAsDouble();
@@ -53,7 +53,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public void setVoltage(double volts) {
-    if (isZeroed) {
+    if (isZeroed) { //have to press reset button first or it wont run
       volts = MathUtil.clamp(volts, -ElevatorConstants.kMaxVolts, ElevatorConstants.kMaxVolts);
       leftElevator.setControl(new VoltageOut(volts));
     } else {

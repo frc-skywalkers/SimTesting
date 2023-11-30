@@ -14,7 +14,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import java.util.function.DoubleSupplier;
 
-public class Macros {
+public class Macros { //similar to last years format
   private final Drive drive;
   private final Arm arm;
   private final Elevator elevator;
@@ -26,10 +26,6 @@ public class Macros {
     this.elevator = elevator;
     this.intake = intake;
   }
-
-  /**
-   * Field relative drive command using two joysticks (controlling linear and angular velocities).
-   */
 
   public Command moveToPreset(double elevatorPos, double armPos){
     return Commands.parallel(
