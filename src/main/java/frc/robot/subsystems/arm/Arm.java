@@ -105,12 +105,16 @@ public class Arm extends SubsystemBase {
   }
 
   public void runVelocity(double velocity) {
-    io.setVelocity(velocity);
+    io.setVoltage(velocity * 12);
   }
 
   //converts to RPM for logging
   public double getVelocityRPM() {
     return Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
+  }
+
+  public double getPosition() {
+    return inputs.positionRad;
   }
 
   public void runCharacterizationVolts(double volts) {

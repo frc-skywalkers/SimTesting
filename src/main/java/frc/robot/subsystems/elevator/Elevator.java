@@ -104,7 +104,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public void runVelocity(double velocity) {
-    io.setVelocity(velocity);
+    io.setVoltage(velocity * 12);
   }
 
   /** Returns the current velocity in RPM. */
@@ -115,6 +115,10 @@ public class Elevator extends SubsystemBase {
   /** Runs forwards at the commanded voltage. */
   public void runCharacterizationVolts(double volts) {
     io.setVoltage(volts);
+  }
+
+  public double getPosition() {
+    return inputs.positionRad;
   }
 
   /** Returns the average drive velocity in radians/sec. */
