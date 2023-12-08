@@ -91,4 +91,6 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     leftElevator.setPosition(0);
     isZeroed = true;
   }
+
+  public boolean zeroed() {return isZeroed;}
 }

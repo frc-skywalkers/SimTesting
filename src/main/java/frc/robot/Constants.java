@@ -3,6 +3,9 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
+import frc.robot.lightstrip.LedState;
+import frc.robot.lightstrip.TempLedState;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -36,7 +39,21 @@ public final class Constants {
     public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
     public static final int PigeonID = 13;
+    public static final double kSlowmode = 0.6;
   }
+
+  public static final class OIConstants {
+    public static final double kDeadband = 0.15;
+
+    public static final int kDriverControllerPort = 0;
+    public static final int kDriverControllerPort2 = 1;
+
+    public static final int kDriverYAxis = 1;
+    public static final int kDriverXAxis = 0;
+    public static final int kDriverRotAxis = 4;
+    public static final int kDriverFieldOrientedButtonIdx = 1;
+}
+
 
   public final class FFConstants {
     public static final double START_DELAY_SECS = 2.0;
@@ -231,4 +248,83 @@ public final class Constants {
           return (speed * 20850) - 1365;
       }
   }
+
+  public static final class LimelightConstants{
+    public static double kPx = 5; //meters
+    public static double kPy = 5; //meters
+    public static double kPr = 0.2; //degrees
+    public static double kDx = 0;
+    public static double kDy = 0;
+    public static double kDr = 0;
+    public static double kIx = 0;
+    public static double kIy = 0;
+    public static double kIr = 0;
+
+    public static double xclamp = 0.8; //maximum clamped speed is 0.6 + 0.5 (min)
+    public static double yclamp = 0.8;
+    public static double rclamp = 2;
+
+    //public static double tagheight = 0.49; //19.3 inches to meters
+
+    public static double xtolerance = 0.02; 
+    public static double ytolerance = 0.02; 
+    public static double rtolerance = 2; //degrees
+
+    public static double mountingangle = 0; //for adjustable camera
+    public static double cameraheight = Units.inchesToMeters(17.5); //14-ish inches, to meters, REDO
+    public static double RTheight = Units.inchesToMeters(22.55); //game manual 24.125
+    public static double objectHeight = Units.inchesToMeters(0);
+
+    public static double limelightOffsetCenter = Units.inchesToMeters(10.5);
+
+    public static final class SecondStageConeConstants{
+        public static double targetXMeters = 0.92;
+        public static double targetYMeters = 0;
+        public static double targetRDeg = 0;
+    }
+}
+
+public static final class DashboardConstants {
+    public static boolean SwerveDebugging = true;
+    public static boolean SwerveDriver = true;
+    public static boolean ArmDebugging = true;
+    public static boolean ArmDriver = true;
+    public static boolean ElevatorDebugging = true;
+    public static boolean ElevatorDriver = true;
+    public static boolean IntakeDebugging = true;
+    public static boolean IntakeDriver = true;
+    public static boolean AutoDebugging = true;
+    public static boolean AutoDriver = true;
+    public static boolean TeleDebugging = true;
+    public static boolean TeleDriver = true;
+    public static boolean LimelightDebugging = true;
+    public static boolean LimelightDriver = true;
+}
+
+public static final class lightstripConstants {
+    public static int redPort = 1;
+    public static int greenPort = 2;
+    public static int bluePort = 0;
+
+    public static LedState defaultState = new LedState(255, 0, 0, "Solid");
+    public static TempLedState successSignal = new TempLedState(0, 255, 0, "Solid", 2);
+    public static LedState coneIntake = new LedState(255, 200, 0, "Solid");
+    public static LedState cubeIntake = new LedState(195, 0, 255, "Solid");
+}
+public static final class Presets {
+  public static final Preset STOW_PRESET = new Preset(1.6, 0); // done
+  public static final Preset GROUND_INTAKE_PRESET = new Preset(-0.19, 0.10); // don't use
+  public static final Preset GROUND_INTAKE_CONE_PRESET = new Preset(0.22, 0);     
+  public static final Preset GROUND_INTAKE_CUBE_PRESET = new Preset(0.1, 0.01); // done
+  public static final Preset SUBSTATION_INTAKE_CONE_PRESET = new Preset(0.06, 1.25);
+  public static final Preset SUBSTATION_INTAKE_PRESET = new Preset(0.0, 1.13);
+  public static final Preset SUBSTATION_INTAKE_CUBE_PRESET = new Preset(0.45, 1.05);
+  public static final Preset CONE_2ND_STAGE_PRESET = new Preset(0.54, 0.63);
+  public static final Preset CONE_3RD_STAGE_PRESET = new Preset(0.48, 1.16);
+  public static final Preset CUBE_2ND_STAGE_PRESET = new Preset(0.81, 0.60);
+  public static final Preset CUBE_3RD_STAGE_PRESET = new Preset(0.57, 1.22);   
+  public static final Preset SINGLE_SUBSTATION_CUBE = new Preset(1.85, 0);
+  public static final Preset SINGLE_SUBSTATION_CONE = new Preset(0.72, 0.68);
+}
+
 }

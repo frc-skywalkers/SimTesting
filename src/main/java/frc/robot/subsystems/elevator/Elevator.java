@@ -24,10 +24,12 @@ public class Elevator extends SubsystemBase {
   private final ProfiledPIDController pid;
   public boolean enabled = false;
   public double goal;
+  public boolean isZeroed;
 
   /** Creates a new Elevator. */
   public Elevator(ElevatorIO io) {
     this.io = io;
+    isZeroed = io.zeroed();
 
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
@@ -65,7 +67,7 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("ElevatorVolts", inputs.appliedVolts);
     Logger.recordOutput("ElevatorCurrent", inputs.currentAmps);
 
-    if (enabled) {
+    if (enabled&&isZeroed) {
       //System.out.println("ajskdl"); //working
       pid.setGoal(new State(goal, 0));
       pid.setTolerance(0.07, 0.07);
@@ -121,8 +123,16 @@ public class Elevator extends SubsystemBase {
     return inputs.positionRad;
   }
 
+  public double getCurrent() {
+    return inputs.currentAmps[0]; //"leader" and "follower"
+  }
+
   /** Returns the average drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
     return inputs.velocityRadPerSec;
+  }
+
+  public void reset() {
+    io.reset();
   }
 }

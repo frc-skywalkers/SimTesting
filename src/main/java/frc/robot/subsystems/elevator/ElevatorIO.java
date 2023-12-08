@@ -12,6 +12,7 @@ public interface ElevatorIO {
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
   }
+  public boolean isZeroed = false;
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ElevatorIOInputs inputs) {}
@@ -30,6 +31,8 @@ public interface ElevatorIO {
   public default void stop() {}
 
   public default void periodic() {}
+
+  public default boolean zeroed(){return isZeroed;}
 
   /** Set velocity PID constants. */
   public default void configurePID(double kP, double kI, double kD) {}

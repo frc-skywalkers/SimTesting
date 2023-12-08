@@ -6,7 +6,9 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -31,6 +33,8 @@ public class Drive extends SubsystemBase {
   private Rotation2d lastGyroRotation = new Rotation2d();
 
   private Field2d m_field = new Field2d();
+
+  public boolean slowmode = false;
 
   public Drive(
       GyroIO gyroIO,
@@ -109,8 +113,11 @@ public class Drive extends SubsystemBase {
     }
     // Apply the twist (change since last loop cycle) to the current pose
     pose = pose.exp(twist);
-    Logger.recordOutput("Odometry/Robot", getPose());
-    m_field.setRobotPose(getPose());
+    Logger.recordOutput("Odometry/Robot", getPose()); //robot not showing up on field
+    Logger.recordOutput("Odometry/Robot3d", new Pose3d(getPose().getX(), getPose().getY(), 0, new Rotation3d(getPose().getRotation().getDegrees(), 0, 0)));
+    Logger.recordOutput("Odometry/posex", getPose().getX());
+    Logger.recordOutput("Odometry/posey", getPose().getY());
+    m_field.setRobotPose(getPose()); 
   }
 
   /**
@@ -119,7 +126,6 @@ public class Drive extends SubsystemBase {
    * @param speeds Speeds in meters/sec
    */
   public void runVelocity(ChassisSpeeds speeds) {
-
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
@@ -190,6 +196,9 @@ public class Drive extends SubsystemBase {
     return pose.getRotation();
   }
 
+  public Rotation2d getYaw() {
+    return gyroInputs.yawPosition;
+  }
   public double getPitch() {
     return gyroInputs.doublepitch;
   }
@@ -197,6 +206,14 @@ public class Drive extends SubsystemBase {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     this.pose = pose;
+  }
+
+  public void reset(){
+    setPose(new Pose2d(0, 0, new Rotation2d(0)));
+  }
+
+  public void setHeading(double angle){
+    setPose(new Pose2d(getPose().getX(), getPose().getY(), new Rotation2d(angle)));
   }
 
   /** Returns the maximum linear speed in meters per sec. */

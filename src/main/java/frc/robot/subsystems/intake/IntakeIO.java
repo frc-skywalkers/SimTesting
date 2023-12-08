@@ -17,12 +17,25 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
   @AutoLog
+
+
   public static class IntakeIOInputs {
+
+    public enum Mode {
+    CONE(-1),
+    CUBE(1);
+
+    public int multiplier;
+
+    Mode(int m) {
+      multiplier = m;
+    }
+  }
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
-    public int Mode = 0;
+    public int modeinput = 1;
   }
 
   /** Updates the set of loggable inputs. */
@@ -40,6 +53,10 @@ public interface IntakeIO {
 
   /** Stop in open loop. */
   public default void stop() {}
+
+  public default void setMode(int m) {}
+
+  public default void toggleMode() {}
 
   /** Set velocity PID constants. */
   public default void configurePID(double kP, double kI, double kD) {}

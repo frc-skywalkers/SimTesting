@@ -28,21 +28,9 @@ public class IntakeIOSim implements IntakeIO {
   private double ffVolts = 0.0;
   private double appliedVolts = 0.0;
 
-  public final static int conePiece = 1;
-  public final static int cubePiece = -1;
-
-  public Mode mode = Mode.CUBE;
-
-  public enum Mode {
-    CONE(1),
-    CUBE(-1);
-
-    public int multiplier;
-
-    Mode(int m) {
-      multiplier = m;
-    }
-  }
+  public final static int conePiece = -1;
+  public final static int cubePiece = 1;
+  public static int mode = 1;
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
@@ -58,6 +46,7 @@ public class IntakeIOSim implements IntakeIO {
     inputs.velocityRadPerSec = intakeSim.getAngularVelocityRadPerSec(); //takes updated values and puts them in autologged for intake.java
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = new double[] {intakeSim.getCurrentDrawAmps()};
+    inputs.modeinput = mode;
   }
 
   @Override
@@ -75,11 +64,11 @@ public class IntakeIOSim implements IntakeIO {
   }
 
   public void moveIn(double ffVolts) {
-    setVelocity(IntakeConstants.kMaxIntakeSpeed * mode.multiplier, ffVolts);
+    setVelocity(IntakeConstants.kMaxIntakeSpeed * mode, ffVolts);
   }
 
   public void moveOut(double ffVolts) {
-    setVelocity(IntakeConstants.kMaxOuttakeSpeed * mode.multiplier, ffVolts);
+    setVelocity(IntakeConstants.kMaxOuttakeSpeed * mode, ffVolts);
   }
 
   @Override
@@ -90,5 +79,21 @@ public class IntakeIOSim implements IntakeIO {
   @Override
   public void configurePID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);
+  }
+
+  public void toggleMode() {
+    if (mode == conePiece) {
+      setMode(cubePiece);
+    } else if (mode == cubePiece) {
+      setMode(conePiece);
+    }
+  }
+
+  public void setMode(int m) {
+    this.mode = m;
+  }
+
+  public int getMode() {
+    return mode;
   }
 }

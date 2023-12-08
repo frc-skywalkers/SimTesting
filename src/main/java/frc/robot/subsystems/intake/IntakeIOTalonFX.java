@@ -34,26 +34,14 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final StatusSignal<Double> AppliedVolts = intakeMotor.getMotorVoltage();
   private final StatusSignal<Double> Current = intakeMotor.getStatorCurrent();
 
-  public final static int conePiece = 1;
-  public final static int cubePiece = -1;
-
-  public Mode mode = Mode.CUBE;
+  public final static int conePiece = -1; //not sure
+  public final static int cubePiece = 1;
+  public static int mode;
 
   private final boolean differentialIntake = IntakeConstants.differentialIntake;
   
   private double intakeSpeed = 0;
   public boolean stop = false; 
-
-  public enum Mode {
-    CONE(1),
-    CUBE(-1);
-
-    public int multiplier;
-
-    Mode(int m) {
-      multiplier = m;
-    }
-  }
 
 
   public IntakeIOTalonFX() {
@@ -78,6 +66,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.appliedVolts = AppliedVolts.getValueAsDouble();
     inputs.currentAmps =
         new double[] {Current.getValueAsDouble()};
+    inputs.modeinput = mode;
   }
 
   @Override
@@ -92,13 +81,13 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   public void moveIn(double ffvolts) {
-    setSpeed(IntakeConstants.kMaxIntakeSpeed * mode.multiplier);
-    intakeSpeed = IntakeConstants.kMaxIntakeSpeed * mode.multiplier;
+    setSpeed(IntakeConstants.kMaxIntakeSpeed * mode);
+    intakeSpeed = IntakeConstants.kMaxIntakeSpeed * mode;
   }
 
   public void moveOut(double ffvolts) {
-    setSpeed(IntakeConstants.kMaxOuttakeSpeed * mode.multiplier);
-    intakeSpeed = IntakeConstants.kMaxOuttakeSpeed * mode.multiplier;
+    setSpeed(IntakeConstants.kMaxOuttakeSpeed * mode);
+    intakeSpeed = IntakeConstants.kMaxOuttakeSpeed * mode;
   }
 
   @Override
@@ -121,7 +110,7 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   public boolean pieceHeld() {
-    if(mode == Mode.CONE) {
+    if(mode == conePiece) {
       return getActualCurrent() > IntakeConstants.conePieceHeldThreshold;
     } else {
       return getActualCurrent() > IntakeConstants.cubePieceHeldThreshold;
@@ -129,31 +118,26 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   private double getThreshold() {
-    if(mode == Mode.CONE) {
+    if(mode == conePiece) {
       return IntakeConstants.conePieceHeldThreshold;
     } else {
       return IntakeConstants.cubePieceHeldThreshold;
     }
   }
 
-  public void holdObject() {
-    intakeMotor.setVoltage(IntakeConstants.kHoldSpeed * 12.0000 * mode.multiplier);
-    intakeSpeed = 0;
-  }
-
-  public void setMode(Mode m) {
+  public void setMode(int m) {
     this.mode = m;
   }
 
-  public Mode getMode() {
+  public int getMode() {
     return mode;
   }
 
   public void toggleMode() {
-    if (mode == Mode.CONE) {
-      setMode(Mode.CUBE);
-    } else if (mode == Mode.CUBE) {
-      setMode(Mode.CONE);
+    if (mode == conePiece) {
+      setMode(cubePiece);
+    } else if (mode == cubePiece) {
+      setMode(conePiece);
     }
   }
 

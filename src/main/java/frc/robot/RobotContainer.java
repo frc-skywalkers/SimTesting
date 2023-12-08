@@ -19,10 +19,12 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.Macros;
+import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Visualizer;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOSim;
@@ -59,6 +61,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Arm arm;
   private final Visualizer visualizer;
+  private final Limelight limelight;
   // private MechanismLigament2d m_elevator;
   // private MechanismLigament2d m_arm;
   // private MechanismLigament2d m_joint;
@@ -66,8 +69,8 @@ public class RobotContainer {
   // MechanismRoot2d root;
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandXboxController controller2 = new CommandXboxController(1);
+  private final CommandXboxController driverJoystick = new CommandXboxController(OIConstants.kDriverControllerPort);
+  private final CommandXboxController operatorJoystick = new CommandXboxController(OIConstants.kDriverControllerPort2);
 
   private final JoystickSim joysticksim = new JoystickSim(0);
   private final Macros macros;
@@ -91,7 +94,8 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX());
         elevator = new Elevator(new ElevatorIOTalonFX());
         arm = new Arm(new ArmIOTalonFX());
-        macros = new Macros(drive, arm, elevator, intake);
+        limelight = new Limelight();
+        macros = new Macros(drive, elevator, arm, intake, limelight);
         visualizer = new Visualizer(arm, elevator);
         break;
 
@@ -107,7 +111,8 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOSim());
         elevator = new Elevator(new ElevatorIOSim());
         arm = new Arm(new ArmIOSim());
-        macros = new Macros(drive, arm, elevator, intake);
+        limelight = new Limelight();
+        macros = new Macros(drive, elevator, arm, intake, limelight);
         visualizer = new Visualizer(arm, elevator);
         break;
 
@@ -123,7 +128,8 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOSim()); //braces thing doesnt work
         elevator = new Elevator(new ElevatorIOSim());
         arm = new Arm(new ArmIOSim());
-        macros = new Macros(drive, arm, elevator, intake);
+        limelight = new Limelight();
+        macros = new Macros(drive, elevator, arm, intake, limelight);
         visualizer = new Visualizer(arm, elevator);
         break;
     }
@@ -176,15 +182,15 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    /* 
+
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-        controller
+            () -> -driverJoystick.getLeftY(),
+            () -> -driverJoystick.getLeftX(),
+            () -> -driverJoystick.getRightX()));
+        driverJoystick.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        driverJoystick
         .b()
         .onTrue(
             Commands.runOnce(
@@ -194,17 +200,17 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    */
+    
 
     elevator.setDefaultCommand(Commands.run(() -> {
-      double linearMagnitude = MathUtil.applyDeadband(-controller.getLeftX(), Constants.kDeadband);
+      double linearMagnitude = MathUtil.applyDeadband(-operatorJoystick.getLeftY(), Constants.kDeadband);
       linearMagnitude = Math.abs(linearMagnitude) * linearMagnitude;
       Logger.recordOutput("elev magnitude", linearMagnitude);
       elevator.runVelocity(linearMagnitude);
     }, elevator));
 
     arm.setDefaultCommand(Commands.run(() -> {
-      double linearMagnitude = MathUtil.applyDeadband(-controller.getLeftY(), Constants.kDeadband);
+      double linearMagnitude = MathUtil.applyDeadband(-operatorJoystick.getRightY(), Constants.kDeadband);
       linearMagnitude = Math.abs(linearMagnitude) * linearMagnitude;
       arm.runVelocity(linearMagnitude);
     }, arm));
@@ -217,9 +223,57 @@ public class RobotContainer {
       Logger.recordOutput("My Mechanism", visualizer.getMech());
     }, visualizer));
     
-    controller.y().onTrue(Commands.runOnce(() -> intake.moveIn()));
-    controller.x().onTrue(Commands.runOnce(() -> intake.moveOut()));
-    controller.a().onTrue(Commands.runOnce(() -> intake.stop()));
+    driverJoystick.y().onTrue(Commands.runOnce(() -> drive.reset(), drive));
+    driverJoystick.x().onTrue(Commands.runOnce(() -> drive.setHeading(180.000), drive));
+    driverJoystick.leftBumper().onTrue(Commands.runOnce(() -> drive.stop(), drive));
+    //driverJoystick.rightBumper().onTrue(Commands.runOnce(swerve::stopModules, swerve)); //same thing?
+
+    //driverJoystick.leftTrigger().whileTrue(Commands.runOnce(() -> swerve.slowmode = true)); //
+    //driverJoystick.leftTrigger().whileFalse(Commands.runOnce(() -> swerve.slowmode = false)); 
+
+    operatorJoystick.start().onTrue(macros.home());
+    operatorJoystick.rightTrigger().onTrue(
+            Commands.runOnce(() -> {
+            arm.stop(); //disable arm and elevator
+            elevator.stop();
+        }, arm, elevator));
+        operatorJoystick.x().onTrue(
+          macros.general2ndStage()
+      );
+
+      operatorJoystick.y().onTrue(
+          macros.general3rdStage()
+      );
+
+      operatorJoystick.b().onTrue(
+          macros.setCubeMode()
+      );
+
+      operatorJoystick.a().onTrue(
+          macros.setConeMode()
+      );
+      operatorJoystick.povUp().onTrue(
+            macros.substationIntake()
+        );
+        operatorJoystick.povDown().onTrue(
+            macros.stow()
+        );
+        operatorJoystick.povLeft().onTrue(
+            macros.groundIntake()
+        );
+
+        operatorJoystick.povRight().onTrue(
+            Commands.runOnce(() -> {
+            arm.stop(); //replace with disable
+            elevator.stop();
+        }, arm, elevator));
+        
+        operatorJoystick.leftBumper().onTrue(
+            macros.outtake()
+        );
+        operatorJoystick.rightBumper().onTrue(
+            macros.intake()
+        );
     
   }
 

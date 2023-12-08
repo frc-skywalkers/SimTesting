@@ -18,6 +18,8 @@ public class ElevatorIOSim implements ElevatorIO {
   private double ffVolts = 0.0;
   private double appliedVolts = 0.0;
 
+  public boolean isZeroed = true;
+
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     elevator.update(0.02);
@@ -42,6 +44,8 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   public void reset() {}
+
+  public boolean zeroed() {return isZeroed;}
 
   /*
   @Override
