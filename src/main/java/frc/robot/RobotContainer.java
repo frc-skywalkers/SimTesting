@@ -203,14 +203,14 @@ public class RobotContainer {
     
 
     elevator.setDefaultCommand(Commands.run(() -> {
-      double linearMagnitude = MathUtil.applyDeadband(-operatorJoystick.getLeftY(), Constants.kDeadband);
+      double linearMagnitude = MathUtil.applyDeadband(-operatorJoystick.getRightY(), Constants.kDeadband); //getLeft
       linearMagnitude = Math.abs(linearMagnitude) * linearMagnitude;
       Logger.recordOutput("elev magnitude", linearMagnitude);
       elevator.runVelocity(linearMagnitude);
     }, elevator));
 
     arm.setDefaultCommand(Commands.run(() -> {
-      double linearMagnitude = MathUtil.applyDeadband(-operatorJoystick.getRightY(), Constants.kDeadband);
+      double linearMagnitude = MathUtil.applyDeadband(-operatorJoystick.getLeftY(), Constants.kDeadband);
       linearMagnitude = Math.abs(linearMagnitude) * linearMagnitude;
       arm.runVelocity(linearMagnitude);
     }, arm));

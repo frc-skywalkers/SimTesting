@@ -33,16 +33,16 @@ public class Visualizer extends SubsystemBase {
   public Visualizer(Arm arm, Elevator elevator) {
     this.arm = arm;
     this.elevator = elevator;
-    mech = new Mechanism2d(3, 3);
-    root = mech.getRoot("angled elev", 1, 0.5);
+    mech = new Mechanism2d(1.5, 3);
+    root = mech.getRoot("angled elev", 0.5, 0);
 
-    m_elevator = root.append(new MechanismLigament2d("elevator", 0.15, 55));
+    m_elevator = root.append(new MechanismLigament2d("elevator", 0.1, 55));
     m_joint =
         m_elevator.append(
-            new MechanismLigament2d("joint", 0.3, -55, 1, new Color8Bit(Color.kPurple)));
+            new MechanismLigament2d("joint", 0.5*0.920, -55, 3, new Color8Bit(Color.kPurple)));
     m_arm =
       m_joint.append(
-          new MechanismLigament2d("arm", 0.15, 0, 3, new Color8Bit(Color.kPink)));
+          new MechanismLigament2d("arm", 0.5, 0, 3, new Color8Bit(Color.kPink)));
   
     SmartDashboard.putData("Mech2d", mech);
     Logger.recordOutput("My Mechanism", mech);
